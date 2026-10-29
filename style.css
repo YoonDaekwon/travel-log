@@ -1,24 +1,24 @@
 :root {
-  --bg: #f6f9fb;
+  --bg: #ffffff;
   --surface: #ffffff;
   --fg: #1c2530;
   --muted: #5f6f7e;
   --line: #dde6ec;
-  --primary: #0e7c9b;
-  --primary-2: #14a3a0;
+  --primary: #1d63e0;
+  --primary-2: #3b8bff;
   --accent: #ff6b5b;
-  --hero-from: #0b5f7a;
-  --hero-to: #19a7a3;
+  --hero-from: #1747b8;
+  --hero-to: #3b8bff;
   --hero-fg: #ffffff;
-  --th-bg: #e8f4f7;
-  --shadow: 0 6px 24px rgba(14, 60, 90, .08);
+  --th-bg: #e8f0fd;
+  --shadow: 0 6px 24px rgba(20, 50, 120, .10);
 
-  --summary-bg: #e6f4fa; --summary-bd: #0e7c9b;
+  --summary-bg: #e8f0fd; --summary-bd: #1d63e0;
   --warn-bg: #fff2e0;    --warn-bd: #f08a00;
   --check-bg: #e6f6ec;   --check-bd: #1f9d55;
   --tip-bg: #f1ecfb;     --tip-bd: #7a54d6;
 
-  --c0: #0e7c9b; --c0b: #e0f1f6;
+  --c0: #1d63e0; --c0b: #e3ecfc;
   --c1: #d9534f; --c1b: #fdebea;
   --c2: #1f9d55; --c2b: #e3f5ea;
   --c3: #b8730a; --c3b: #fdf0d9;
@@ -32,18 +32,18 @@
     --fg: #e6edf3;
     --muted: #92a3b3;
     --line: #26323f;
-    --primary: #4cc3e0;
-    --hero-from: #0a3d52;
-    --hero-to: #0f6f73;
-    --th-bg: #1b2a36;
+    --primary: #6ea8ff;
+    --hero-from: #0f2a66;
+    --hero-to: #1f4fa8;
+    --th-bg: #1b2740;
     --shadow: 0 6px 24px rgba(0, 0, 0, .35);
 
-    --summary-bg: #11303d; --summary-bd: #4cc3e0;
+    --summary-bg: #14264a; --summary-bd: #6ea8ff;
     --warn-bg: #3a2a12;    --warn-bd: #f5a524;
     --check-bg: #12301f;   --check-bd: #4cc38a;
     --tip-bg: #2a2142;     --tip-bd: #a98cf0;
 
-    --c0: #6fd0e8; --c0b: #12303b;
+    --c0: #8dbbff; --c0b: #14264a;
     --c1: #ff8f8a; --c1b: #3b1a1a;
     --c2: #6fd69c; --c2b: #12301f;
     --c3: #f0b455; --c3b: #3a2a12;

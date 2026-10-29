@@ -31,7 +31,7 @@ function parseFrontmatter(raw) {
 const FAVICON =
   "data:image/svg+xml," +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0e7c9b"/><stop offset="1" stop-color="#ff6b5b"/></linearGradient></defs><circle cx="16" cy="16" r="14" fill="url(#g)"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d63e0"/><stop offset="1" stop-color="#ff6b5b"/></linearGradient></defs><circle cx="16" cy="16" r="14" fill="url(#g)"/></svg>',
   );
 
 function layout({ title, description, base, content, type = "website", image }) {
