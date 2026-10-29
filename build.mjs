@@ -4,6 +4,8 @@ import path from "node:path";
 import { marked } from "marked";
 
 const SITE = {
+  // GitHub Pages 주소. 도메인을 바꾸면 여기만 고친다. (canonical, 공유 미리보기, sitemap 에 쓰인다)
+  url: "https://yoondaekwon.github.io/travel-log/",
   title: "여행 기록장",
   description: "가기 전에 조사하고, 확인한 것과 못 한 것을 구분해서 적는 여행 블로그",
 };
@@ -34,7 +36,10 @@ const FAVICON =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d63e0"/><stop offset="1" stop-color="#ff6b5b"/></linearGradient></defs><circle cx="16" cy="16" r="14" fill="url(#g)"/></svg>',
   );
 
-function layout({ title, description, base, content, type = "website", image }) {
+const abs = (p = "") => new URL(p, SITE.url).href;
+
+function layout({ title, description, base, content, type = "website", image, pagePath = "", jsonLd, published }) {
+  const url = abs(pagePath);
   return `<!doctype html>
 <html lang="ko">
 <head>
@@ -42,12 +47,22 @@ function layout({ title, description, base, content, type = "website", image }) 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
+<meta name="theme-color" content="#1d63e0">
+<link rel="canonical" href="${url}">
 <meta property="og:type" content="${type}">
 <meta property="og:site_name" content="${esc(SITE.title)}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
-<meta property="og:locale" content="ko_KR">${image ? `\n<meta property="og:image" content="${esc(image)}">` : ""}
-<link rel="icon" href="${FAVICON}">
+<meta property="og:url" content="${url}">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="${esc(image)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">${published ? `\n<meta property="article:published_time" content="${esc(published)}">` : ""}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="${esc(image)}">
+<link rel="icon" href="${FAVICON}">${jsonLd ? `\n<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>` : ""}
 <link rel="stylesheet" href="${base}style.css">
 </head>
 <body>
@@ -120,7 +135,8 @@ await fs.mkdir(OUT_DIR, { recursive: true });
 await fs.copyFile("style.css", path.join(OUT_DIR, "style.css"));
 await fs.writeFile(path.join(OUT_DIR, ".nojekyll"), "");
 // 글에서 쓰는 이미지: blog/images/ -> docs/images/
-await fs.cp("images", path.join(OUT_DIR, "images"), { recursive: true }).catch(() => {});
+// (images/og/src 의 원본 사진은 공유 이미지를 만들 때만 쓰므로 배포에서 뺀다)
+await fs.cp("images", path.join(OUT_DIR, "images"), { recursive: true, filter: (s) => !s.includes(path.join("og", "src")) }).catch(() => {});
 
 for (const p of posts) {
   const dir = path.join(OUT_DIR, "posts", p.slug);
@@ -143,7 +159,29 @@ ${p.html}
 </div>`;
   await fs.writeFile(
     path.join(dir, "index.html"),
-    layout({ title: `${p.title} | ${SITE.title}`, description: p.description, base: "../../", content, type: "article" }),
+    layout({
+      title: `${p.title} | ${SITE.title}`,
+      description: p.description,
+      base: "../../",
+      content,
+      type: "article",
+      image: abs(p.image ?? `images/og/${p.slug}.png`),
+      pagePath: `posts/${p.slug}/`,
+      published: p.date,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: p.title,
+        description: p.description,
+        datePublished: p.date,
+        dateModified: p.checked ?? p.date,
+        inLanguage: "ko-KR",
+        image: abs(p.image ?? `images/og/${p.slug}.png`),
+        mainEntityOfPage: abs(`posts/${p.slug}/`),
+        keywords: p.tags.join(", "),
+        publisher: { "@type": "Organization", name: SITE.title },
+      },
+    }),
   );
 }
 
@@ -166,6 +204,8 @@ await fs.writeFile(
     title: SITE.title,
     description: SITE.description,
     base: "./",
+    image: abs("images/og/default.png"),
+    jsonLd: { "@context": "https://schema.org", "@type": "WebSite", name: SITE.title, url: SITE.url, description: SITE.description, inLanguage: "ko-KR" },
     content: `<section class="hero">
 <div class="hero-inner">
 <p class="eyebrow">TRAVEL NOTES</p>
@@ -191,8 +231,24 @@ await fs.writeFile(
     title: `소개 | ${SITE.title}`,
     description: SITE.description,
     base: "../",
+    image: abs("images/og/default.png"),
+    pagePath: "about/",
     content: `<div class="page"><article class="post about">\n${aboutHtml}<p class="back"><a href="../">← 글 목록으로</a></p></article></div>`,
   }),
 );
+
+// 검색엔진용: sitemap.xml, robots.txt
+const urls = [
+  { loc: abs(), date: posts[0]?.date },
+  { loc: abs("about/") },
+  ...posts.map((p) => ({ loc: abs(`posts/${p.slug}/`), date: p.checked ?? p.date })),
+];
+await fs.writeFile(
+  path.join(OUT_DIR, "sitemap.xml"),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
+    .map((u) => `<url><loc>${u.loc}</loc>${u.date ? `<lastmod>${u.date}</lastmod>` : ""}</url>`)
+    .join("\n")}\n</urlset>\n`,
+);
+await fs.writeFile(path.join(OUT_DIR, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${abs("sitemap.xml")}\n`);
 
 console.log(`${posts.length}개 글을 ${OUT_DIR}/ 에 만들었습니다.`);

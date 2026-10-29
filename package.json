@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
+    "og": "node og.mjs",
     "dev": "node build.mjs && npx --yes serve docs -l 4000"
   },
   "dependencies": {

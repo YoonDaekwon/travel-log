@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yoondaekwon.github.io/travel-log/sitemap.xml
